@@ -1,0 +1,4 @@
+@EndUserText.label: ' UI RAP Test'
+define service Zui_C_will_TRAVEL {
+  expose zwill_c_travel;
+}
