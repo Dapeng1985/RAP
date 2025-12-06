@@ -11,6 +11,13 @@ define root view entity zwill_r_travel
       begin_date  as BeginDate,
       end_date    as EndDate,
       status      as Status,
+      @Semantics.systemDateTime.lastChangedAt: true
       changed_at  as ChangedAt,
-      changed_by  as ChangedBy
+      @Semantics.user.lastChangedBy: true
+      changed_by  as ChangedBy,
+      @Semantics.systemDateTime.createdAt: true
+      created_at as CreatedAt,
+      @Semantics.user.createdBy: true
+      created_by as CreatedBy
+      
 }

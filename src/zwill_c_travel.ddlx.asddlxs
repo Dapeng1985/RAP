@@ -27,8 +27,13 @@ annotate entity zwill_c_travel with
   TravelId;
 
   @UI: {
-  lineItem: [ { position: 20, importance: #HIGH } ],
-  identification: [ { position: 30, importance: #HIGH } ]
+  lineItem: [ { position: 20, importance: #HIGH }, 
+              { type:#FOR_ACTION, dataAction: 'setCancel', label:'Cancel' } ,  //使用自定义的Action（在List report中添加按钮）
+              { type:#FOR_ACTION, dataAction: 'allAc', label:'All' }
+            ],
+  identification: [ { position: 30, importance: #HIGH },
+                    { type:#FOR_ACTION, dataAction: 'setCancel', label:'Cancel' }   //使用自定义的Action（在Object Page中添加按钮）
+                  ]
   }
 
   Description;
