@@ -26,6 +26,12 @@
      <MSGNR>130</MSGNR>
      <TEXT>This travel is already cancelled</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZWILL_MESSAGE</ARBGB>
+     <MSGNR>140</MSGNR>
+     <TEXT>Please entry the required field</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

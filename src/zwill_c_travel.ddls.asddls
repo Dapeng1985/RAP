@@ -13,6 +13,13 @@ define root view entity zwill_c_travel
   key TravelId,
       Description,
       @Search.defaultSearchElement: true
+      @Consumption.valueHelpDefinition: [{ entity:{ name: '/DMO/I_Customer_StdVH', element: 'CustomerID' },
+                                           additionalBinding: [{ localElement: 'Description', element:'FirstName', usage: #RESULT }],
+                                           qualifier:  '1', label: 'VHelp1' },
+                                         { entity: { name: '/DMO/I_Customer', element: 'CustomerID' },
+                                           additionalBinding: [{ localElement: 'Description', element: 'FirstName', usage: #RESULT }],
+                                           qualifier: '2', label: 'VHelp2' }
+                                        ]
       CustomerId,
       BeginDate,
       EndDate,

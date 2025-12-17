@@ -27,7 +27,16 @@ CLASS zcm_will_travel DEFINITION
         attr2 TYPE scx_attrname VALUE '',
         attr3 TYPE scx_attrname VALUE '',
         attr4 TYPE scx_attrname VALUE '',
-      END OF already_cancelled.
+      END OF already_cancelled,
+
+      BEGIN OF fill_empty,
+        msgid TYPE symsgid VALUE 'ZWILL_MESSAGE',
+        msgno TYPE symsgno VALUE '130',
+        attr1 TYPE scx_attrname VALUE '',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF fill_empty.
 
     METHODS constructor
       IMPORTING
@@ -44,11 +53,15 @@ CLASS zcm_will_travel IMPLEMENTATION.
 
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
-    super->constructor(
-    previous = previous
-    ).
+    super->constructor( previous = previous ).
 
-    if_abap_behv_message~m_severity = severity.
+
+
+    if severity is supplied.
+      if_abap_behv_message~m_severity = severity.
+    else.
+      if_abap_behv_message~m_severity = if_abap_behv_message~severity-error.
+    endif.
 
     CLEAR me->textid.
     IF textid IS INITIAL.

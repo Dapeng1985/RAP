@@ -1,19 +1,25 @@
 managed implementation in class zbp_will_r_travel unique;
-//strict ( 2 );
+strict ( 2 );
 
 define behavior for zwill_r_travel alias travel
 persistent table zwill_travel
 lock master
-//authorization master ( instance )
+authorization master ( global, instance )
 etag master ChangedAt
 {
   create;
-  update;
+  update (features : instance);
   delete;
   field ( readonly : update ) AgencyId, TravelId;
+//  field ( mandatory:create ) AgencyId, TravelId;
+
+  field ( features: instance ) CustomerId,BeginDate;
+
+  validation validateStatus on save { create; update; field Status; }
+  determination set_owner on modify { create; }
 
 
-   action setCancel result [1] $self;
+   action (features : instance) setCancel result [1] $self;
    static action allAc;
 
   mapping for zwill_travel corresponding
