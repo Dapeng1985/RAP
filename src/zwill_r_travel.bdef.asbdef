@@ -1,19 +1,23 @@
 managed implementation in class zbp_will_r_travel unique;
-strict ( 2 );
+// strict ( 2 );
 
+with draft;
 define behavior for zwill_r_travel alias travel
 persistent table zwill_travel
-lock master
+draft table zwill_travel_d
+lock master total etag ChangedAt
 authorization master ( global, instance )
-etag master ChangedAt
+etag master locChangedAt
 {
   create;
   update (features : instance);
   delete;
-  field ( readonly : update ) AgencyId, TravelId;
+//  field ( readonly : update ) AgencyId, TravelId;
 //  field ( mandatory:create ) AgencyId, TravelId;
-
   field ( features: instance ) CustomerId,BeginDate;
+
+  field ( readonly ) uuid;
+  field ( numbering: managed ) uuid;
 
   validation validateStatus on save { create; update; field Status; }
   determination set_owner on modify { create; }
@@ -21,6 +25,10 @@ etag master ChangedAt
 
    action (features : instance) setCancel result [1] $self;
    static action allAc;
+
+   draft action Edit with additional implementation;
+   draft action Activate with additional implementation;
+   draft action Discard with additional implementation;
 
   mapping for zwill_travel corresponding
     {
@@ -35,5 +43,6 @@ etag master ChangedAt
       ChangedBy   = changed_by;
       createdAt   = created_at;
       createdBy   = created_by;
+      LocChangedAt = loc_changed_at;
     }
 }

@@ -15,6 +15,9 @@ annotate entity zwill_c_travel with
   position: 10 }
   ]
 
+  @UI.hidden: true
+  uuid;
+  
   @UI: {
   identification: [ { position: 10, importance: #LOW } ]
   }
@@ -70,5 +73,8 @@ annotate entity zwill_c_travel with
 
   @UI.hidden: true
   ChangedBy;
+  
+  @UI.hidden: true
+  LocChangedAt;
 
 }

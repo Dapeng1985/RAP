@@ -8,9 +8,10 @@ define root view entity zwill_c_travel
   provider contract transactional_query
   as projection on zwill_r_travel
 {
+  key uuid,
       @Search.defaultSearchElement: true
-  key AgencyId,
-  key TravelId,
+      AgencyId,
+      TravelId,
       Description,
       @Search.defaultSearchElement: true
       @Consumption.valueHelpDefinition: [{ entity:{ name: '/DMO/I_Customer_StdVH', element: 'CustomerID' },
@@ -25,5 +26,6 @@ define root view entity zwill_c_travel
       EndDate,
       Status,
       ChangedAt,
-      ChangedBy
+      ChangedBy,
+      LocChangedAt
 }

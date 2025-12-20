@@ -3,9 +3,10 @@
 @Metadata.ignorePropagatedAnnotations: true
 define root view entity zwill_r_travel
   as select from zwill_travel
-{
-  key agency_id   as AgencyId,
-  key travel_id   as TravelId,
+{ 
+  key uuid        as uuid,
+      agency_id   as AgencyId,
+      travel_id   as TravelId,
       description as Description,
       customer_id as CustomerId,
       begin_date  as BeginDate,
@@ -18,6 +19,8 @@ define root view entity zwill_r_travel
       @Semantics.systemDateTime.createdAt: true
       created_at as CreatedAt,
       @Semantics.user.createdBy: true
-      created_by as CreatedBy
+      created_by as CreatedBy,
+      @Semantics.systemDateTime.localInstanceLastChangedAt: true
+      loc_changed_at as LocChangedAt     // draft table 乐观锁使用
       
 }

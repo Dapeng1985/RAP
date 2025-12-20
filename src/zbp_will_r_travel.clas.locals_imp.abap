@@ -16,6 +16,12 @@ CLASS lhc_zwill_r_travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING keys FOR travel~set_owner.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR travel RESULT result.
+    METHODS edit FOR MODIFY
+      IMPORTING keys FOR ACTION travel~edit.
+    METHODS activate FOR MODIFY
+      IMPORTING keys FOR ACTION travel~activate.
+    METHODS discard FOR MODIFY
+      IMPORTING keys FOR ACTION travel~discard.
 
     METHODS _is_allowed RETURNING VALUE(rec) TYPE abap_boolean.
 ENDCLASS.
@@ -108,7 +114,8 @@ CLASS lhc_zwill_r_travel IMPLEMENTATION.
 
       MODIFY ENTITY IN LOCAL MODE zwill_r_travel
       UPDATE FIELDS ( Status )
-      WITH VALUE #( ( %tky-AgencyId = ls_line-agency_id %tky-TravelId = ls_line-travel_id Status = 'A' ) )
+*      WITH VALUE #( ( %tky-AgencyId = ls_line-agency_id %tky-TravelId = ls_line-travel_id Status = 'A' ) )
+      WITH VALUE #( ( %tky-uuid = ls_line-uuid  Status = 'A' ) )
       FAILED ls_failed.
     ENDLOOP.
 
@@ -245,31 +252,84 @@ CLASS lhc_zwill_r_travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_instance_features.
-    read entity in LOCAL MODE zwill_r_travel
-    fieLDS ( Status BeginDate EndDate )
-    with corrESPONDING #( keys )
-    result data(travels).
+    READ ENTITY IN LOCAL MODE zwill_r_travel
+    FIELDS ( Status BeginDate EndDate )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(travels).
 
-    data(lv_today) = cl_abap_context_info=>get_system_date(  ).
+    DATA(lv_today) = cl_abap_context_info=>get_system_date(  ).
 
-    loop AT travels iNTO dATA(ls_travel).
-      append corrESPONDING #( ls_travel ) to result
-        aSSIGNING fIELD-SYMBOL(<fs_result>).
+    LOOP AT travels INTO DATA(ls_travel).
+      APPEND CORRESPONDING #( ls_travel ) TO result
+        ASSIGNING FIELD-SYMBOL(<fs_result>).
 
       "& 若该条数据状态为C-Cancelled，则取消按钮/更新按钮不可用
-      if ls_travel-Status = 'C'.
+      IF ls_travel-Status = 'C'.
         <fs_result>-%action-setCancel = if_abap_behv=>fc-o-disabled.
         <fs_result>-%update = if_abap_behv=>fc-o-disabled.
-      endif.
+      ENDIF.
 
-      if ls_travel-begindate is not initial and ls_travel-begindate <= lv_today.
+      IF ls_travel-begindate IS NOT INITIAL AND ls_travel-begindate <= lv_today.
         <fs_result>-%field-CustomerId = if_abap_behv=>fc-f-read_only.
         <fs_result>-%field-BeginDate = if_abap_behv=>fc-f-read_only.
-      else.
+      ELSE.
         <fs_result>-%field-CustomerId = if_abap_behv=>fc-f-mandatory.
         <fs_result>-%field-BeginDate = if_abap_behv=>fc-f-mandatory.
-      endif.
-    enDLOOP.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD Edit.
+**&  按key读取数据
+*    READ ENTITY IN LOCAL MODE zwill_r_travel
+*    ALL FIELDS WITH CORRESPONDING #( keys )
+*    RESULT DATA(lt_data).
+*
+**&  修改end date （测试代码：变更EndDate）
+*    MODIFY ENTITY IN LOCAL MODE zwill_r_travel
+*    UPDATE FIELDS ( EndDate )
+*    WITH VALUE #( FOR ls_line IN lt_data
+*                       ( %key = ls_line-%key
+*                         %is_draft = if_abap_behv=>mk-on   "数据保存到draft表
+*                         EndDate = ls_line-EndDate + 1  )
+*                )
+*    REPORTED reported
+*    FAILED failed
+*    MAPPED mapped.
+
+  ENDMETHOD.
+
+  METHOD Activate.
+*    read entity in local mode zwill_r_travel
+*    all FIELDS WITH corrESPONDING #( keys )
+*    result data(lt_data).
+*
+*    modify entity in local mode zwill_r_travel
+*    update fieLDS ( BeginDate )
+*    with value #( for ls_line in lt_data ( %key = ls_line-%key
+*                                          %is_draft = if_abap_behv=>mk-off   "&activate:将保存到active表
+*                                          BeginDate = ls_line-BeginDate - 1 ) )
+*    reported reported
+*    failed failed
+*    mapped mapped.
+  ENDMETHOD.
+
+  METHOD Discard.
+** 对active数据的begin date加一天
+READ ENTITY IN LOCAL MODE zwill_r_travel
+ALL FIELDS WITH CORRESPONDING #( keys )
+RESULT DATA(lt_data).
+
+MODIFY ENTITY IN LOCAL MODE zwill_r_travel
+UPDATE FIELDS ( BeginDate )
+WITH VALUE #( FOR <fs_data> IN lt_data (
+%key = <fs_data>-%key
+%is_draft = if_abap_behv=>mk-off
+BeginDate = <fs_data>-BeginDate + 1
+) )
+REPORTED reported
+FAILED failed
+MAPPED mapped.
   ENDMETHOD.
 
 ENDCLASS.
